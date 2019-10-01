@@ -6,9 +6,11 @@ import 'random-words.dart';
 class RandomWordsState extends State<RandomWords> {
   static const NUM_VALUES = 10;
   final _suggestions = <WordPair>[];
+  final _saved = Set<WordPair>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Widget _buildRow(WordPair pair) {
+    final bool alreadySaved = _saved.contains(pair);
     return Row(children: <Widget>[
       IconButton(
           icon: Icon(Icons.menu), tooltip: 'Navigation menu', onPressed: null),
@@ -29,16 +31,27 @@ class RandomWordsState extends State<RandomWords> {
                   return AlertDialog(
                     title: Text('Olá!'),
                     content: Text(
-                        "Você clicou no ${pair.asPascalCase.toString()} !"),
+                        "You have clicked ${pair.asPascalCase.toString()} !"),
                     actions: <Widget>[
                       new FlatButton(
-                          child: Text('X'),
+                          child: Icon(Icons.close),
                           onPressed: () {
                             Navigator.of(context).pop();
                           })
                     ],
                   );
                 });
+          }),
+      IconButton(
+          icon: Icon(
+            alreadySaved ? Icons.star : Icons.star_border,
+            color: alreadySaved ? Colors.red : null,
+          ),
+          tooltip: 'Save',
+          onPressed: () {
+            setState(() {
+              alreadySaved ? _saved.remove(pair) : _saved.add(pair);
+            });
           }),
     ]);
   }
@@ -66,6 +79,29 @@ class RandomWordsState extends State<RandomWords> {
             children: <Widget>[
               Expanded(
                 child: Text('Name Generator', textDirection: TextDirection.ltr),
+              ),
+              IconButton(
+                icon: Icon(Icons.list),
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (BuildContext context) {
+                    final Iterable<ListTile> tiles = _saved.map((pair) {
+                      return ListTile(
+                        title: Text(pair.asPascalCase),
+                      );
+                    });
+                    return Scaffold(
+                        appBar: AppBar(
+                          title: Row(
+                            children: <Widget>[Expanded(child: Text('List'))],
+                          ),
+                        ),
+                        body: ListView(
+                            children: ListTile.divideTiles(
+                                    context: context, tiles: tiles)
+                                .toList()));
+                  }));
+                },
               ),
               IconButton(
                 icon: Icon(Icons.power_settings_new),
