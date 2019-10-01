@@ -85,9 +85,13 @@ class RandomWordsState extends State<RandomWords> {
                 onPressed: () {
                   Navigator.of(context).push(
                       MaterialPageRoute<void>(builder: (BuildContext context) {
-                    final Iterable<ListTile> tiles = _saved.map((pair) {
-                      return ListTile(
-                        title: Text(pair.asPascalCase),
+                    final Iterable<Row> tiles = _saved.map((pair) {
+                      return Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(pair.asPascalCase),
+                          )
+                        ],
                       );
                     });
                     return Scaffold(
@@ -96,10 +100,15 @@ class RandomWordsState extends State<RandomWords> {
                             children: <Widget>[Expanded(child: Text('List'))],
                           ),
                         ),
-                        body: ListView(
-                            children: ListTile.divideTiles(
-                                    context: context, tiles: tiles)
-                                .toList()));
+                        body: tiles.isEmpty
+                            ? Container(
+                                padding: EdgeInsets.only(top: 30),
+                                alignment: Alignment.topCenter,
+                                child: Icon(Icons.search, size: 120))
+                            : ListView(
+                                children: ListTile.divideTiles(
+                                        context: context, tiles: tiles)
+                                    .toList()));
                   }));
                 },
               ),
