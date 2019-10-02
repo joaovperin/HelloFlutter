@@ -49,9 +49,8 @@ class RandomWordsState extends State<RandomWords> {
           ),
           tooltip: 'Save',
           onPressed: () {
-            setState(() {
-              alreadySaved ? _saved.remove(pair) : _saved.add(pair);
-            });
+            setState(
+                () => alreadySaved ? _saved.remove(pair) : _saved.add(pair));
           }),
     ]);
   }
@@ -85,13 +84,55 @@ class RandomWordsState extends State<RandomWords> {
                 onPressed: () {
                   Navigator.of(context).push(
                       MaterialPageRoute<void>(builder: (BuildContext context) {
-                    final Iterable<Row> tiles = _saved.map((pair) {
-                      return Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(pair.asPascalCase),
-                          )
-                        ],
+                    final Iterable<Widget> tiles = _saved.map((pair) {
+                      return ListTile(
+                        title: Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: Text(pair.asPascalCase,
+                                    style: _biggerFont)),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                return showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text('Wanna remove ' +
+                                            pair.asPascalCase +
+                                            ' ?'),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                              child: Text('Yes'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                return showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                          content: Text(
+                                                              'Not implemented yet.'),
+                                                          actions: <Widget>[
+                                                            CloseButton()
+                                                          ]);
+                                                    });
+                                                // TODO: fix the block above
+                                                // setState(() => _saved.remove(pair));
+                                              }),
+                                          FlatButton(
+                                              child: Text('No'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              })
+                                        ],
+                                      );
+                                    });
+                              },
+                            )
+                          ],
+                        ),
+                        subtitle: Text('nop'),
                       );
                     });
                     return Scaffold(
